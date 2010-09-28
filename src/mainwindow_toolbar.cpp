@@ -92,12 +92,7 @@ void MainWindow::createToolbars()
 	textFontSizeCombo->setCurrentIndex(textFontSizeCombo->findText(QString().setNum(DEFAULT_LABEL_FONT_SIZE)));
 	editSelectedTextToolBar->addWidget(textFontSizeCombo);
 
-	textFontCombo->setEnabled(false);
-	textFontSizeCombo->setEnabled(false);
-	boldTextButton->setEnabled(false);
-	italicTextButton->setEnabled(false);
-	underlineTextButton->setEnabled(false);
-	mouseModeToolBar->setEnabled(false);
+	deactivateToolBar();
 	enableLabelSignals();
 }
 
@@ -130,7 +125,7 @@ void MainWindow::updateTextLabelToolbar()
 	disableLabelSignals();
 
 	int selectedLabels = 0;
-	foreach(QGraphicsItem* item, canvas->items())
+	foreach(QGraphicsItem* item, canvas()->items())
 	{
 		if(ITEM_IS_LABEL)
 		{
@@ -164,7 +159,7 @@ void MainWindow::updateTextLabelToolbar()
 		underlineTextButton->setEnabled(true);
 		bool found = false;
 
-		foreach(QGraphicsItem* item, canvas->items())
+		foreach(QGraphicsItem* item, canvas()->items())
 		{
 			if(ITEM_IS_LABEL)
 			{
@@ -198,7 +193,7 @@ void MainWindow::updateTextLabelToolbar()
 		QList<bool> textLabelsUnderlined;
 		QList<bool> textLabelsItalic;
 		QList<bool> textLabelsBold;
-		foreach(QGraphicsItem* item,canvas->items()){
+		foreach(QGraphicsItem* item,canvas()->items()){
 			if(item->isSelected()){
 				if(ITEM_IS_LABEL){
 					Label *label = dynamic_cast<Label*>(item);
@@ -289,6 +284,8 @@ void MainWindow::updateTextLabelToolbar()
 
 void MainWindow::activateToolBar()
 {
+	closeAction->setEnabled(true);
+
 	editMenu->setEnabled(true);
 	itemMenu->setEnabled(true);
 	insertMenu->setEnabled(true);
@@ -304,4 +301,30 @@ void MainWindow::activateToolBar()
 
 	if(undoStack->count() > 0)
 		undoStack->clear();
+}
+
+void MainWindow::deactivateToolBar()
+{
+	closeAction->setEnabled(false);
+
+	editMenu->setEnabled(false);
+	itemMenu->setEnabled(false);
+	insertMenu->setEnabled(false);
+	mouseModeToolBar->setEnabled(false);
+
+	deleteAction->setEnabled(false);
+	saveAction->setEnabled(false);
+	saveAsAction->setEnabled(false);
+	selectAllAction->setEnabled(false);
+	unselectAllAction->setEnabled(false);
+	addArrowAction->setEnabled(false);
+	insertTextActionGroup->setEnabled(false);
+
+	textFontCombo->setEnabled(false);
+	textFontSizeCombo->setEnabled(false);
+	boldTextButton->setEnabled(false);
+	italicTextButton->setEnabled(false);
+	underlineTextButton->setEnabled(false);
+
+	undoStack->clear();
 }

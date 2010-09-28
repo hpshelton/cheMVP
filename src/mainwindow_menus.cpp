@@ -6,6 +6,7 @@ void MainWindow::createMenus()
 	fileMenu->addAction(openAction);
 	fileMenu->addAction(saveAction);
 	fileMenu->addAction(saveAsAction);
+	fileMenu->addAction(closeAction);
 
 	separatorAction = new QAction("Separator", NULL);
 	separatorAction->setSeparator(true);
@@ -74,7 +75,7 @@ void MainWindow::updateMenus()
 	QList<QString> atomLabelFonts;
 	QList<int> atomLabelFontSizes;
 
-	foreach(QGraphicsItem *item, canvas->selectedItems()){
+	foreach(QGraphicsItem *item, canvas()->selectedItems()){
 		if(item->type() == Bond::Type) {
 			Bond *bond = dynamic_cast<Bond*>(item);
 			bondScaleFactors.append(bond->thickness());
@@ -83,7 +84,7 @@ void MainWindow::updateMenus()
 			Atom *atom = dynamic_cast<Atom*>(item);
 			atomScaleFactors.append(atom->scaleFactor());
 			atomLabels.append(atom->label());
-			atomLabelFonts.append(drawingInfo->getAtomLabelFont().family());
+			atomLabelFonts.append(drawingInfo()->getAtomLabelFont().family());
 			atomLabelFontSizes.append(atom->fontSize());
 		}
 	}

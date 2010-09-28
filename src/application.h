@@ -2,7 +2,8 @@
 #define APPLICATION_H
 
 #include <QApplication>
-#include "MainWindow.h"
+#include "mainwindow.h"
+#include "tab.h"
 
 class Application : public QApplication
 {

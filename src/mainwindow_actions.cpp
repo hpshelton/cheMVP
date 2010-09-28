@@ -26,6 +26,11 @@ void MainWindow::createActions()
 	openAction->setShortcut(tr("Ctrl+O"));
 	connect(openAction, SIGNAL(triggered()), this, SLOT(openFile()));
 
+	closeAction = new QAction(tr("&Close"), this);
+	closeAction->setShortcut(tr("Close this file"));
+	closeAction->setShortcut(tr("Ctrl+W"));
+	connect(closeAction, SIGNAL(triggered()), this, SLOT(closeCurrentTab()));
+
 	exitAction = new QAction(QIcon(":/images/exit.png"),tr("E&xit"), this);
 	exitAction->setShortcut(tr("Ctrl+X"));
 	exitAction->setStatusTip(tr("Quit ChemVP"));
@@ -90,22 +95,22 @@ void MainWindow::createActions()
 
 void MainWindow::deleteItem()
 {
-	if (canvas->selectedItems().isEmpty())
+	if (canvas()->selectedItems().isEmpty())
 		return;
 
 	// TODO - Deletion of at least arrows
 	// Hide bond labels when they're deleted. - HPS
 	// Prevents bond deletion from being undoable, but fixes geometry time step from reinstating deleted bond
-	foreach(QGraphicsItem* i, canvas->selectedItems()) {
+	foreach(QGraphicsItem* i, canvas()->selectedItems()) {
 		if(i->type() == Label::BondLabelType) {
-			foreach(Bond* b, canvas->getBonds()) {
+			foreach(Bond* b, canvas()->getBonds()) {
 				if(b->label() == i)
 					b->toggleLabel();
 			}
 		}
 	}
 
-	QUndoCommand *removeItemCommand = new RemoveItemCommand(canvas);
+	QUndoCommand *removeItemCommand = new RemoveItemCommand(canvas());
 	undoStack->push(removeItemCommand);
 }
 
@@ -118,6 +123,11 @@ void MainWindow::aboutCheMVP()
 
 void MainWindow::showPreferences()
 {
-	Preferences* prefs = new Preferences(canvas, drawingInfo->getDrawingStyle());
+	Preferences* prefs = new Preferences(canvas(), drawingInfo()->getDrawingStyle());
 	prefs->exec();
+}
+
+void MainWindow::closeCurrentTab()
+{
+	this->tabClosed(this->tabWidget->currentIndex());
 }

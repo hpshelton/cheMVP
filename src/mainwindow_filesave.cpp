@@ -94,10 +94,10 @@ void MainWindow::saveAndExit()
 
 void MainWindow::saveImage(const QString &fileName)
 {
-	canvas->unselectAll();
+	canvas()->unselectAll();
 
 	FileType fileType = determineFileType(fileName);
-	QSize imageDimension(canvas->sceneRect().width(), canvas->sceneRect().height());
+	QSize imageDimension(canvas()->sceneRect().width(), canvas()->sceneRect().height());
 
 	QPainter *painter = new QPainter();
 	QPrinter *printer = new QPrinter();
@@ -115,7 +115,7 @@ void MainWindow::saveImage(const QString &fileName)
 		painter->setRenderHint(QPainter::SmoothPixmapTransform, true);
 		painter->setRenderHint(QPainter::Antialiasing, true);
 		painter->setRenderHint(QPainter::HighQualityAntialiasing, true);
-		canvas->render(painter);
+		canvas()->render(painter);
 		painter->end();
 		delete svgGen;
 	}else if(fileType == PNG || fileType == TIFF){
@@ -124,7 +124,7 @@ void MainWindow::saveImage(const QString &fileName)
 		painter->setRenderHint(QPainter::SmoothPixmapTransform, true);
 		painter->setRenderHint(QPainter::Antialiasing, true);
 		painter->setRenderHint(QPainter::HighQualityAntialiasing, true);
-		canvas->render(painter);
+		canvas()->render(painter);
 		painter->end();
 		image->save(fileName);
 		delete image;
@@ -134,7 +134,7 @@ void MainWindow::saveImage(const QString &fileName)
 		painter->setRenderHint(QPainter::SmoothPixmapTransform, true);
 		painter->setRenderHint(QPainter::Antialiasing, true);
 		painter->setRenderHint(QPainter::HighQualityAntialiasing, true);
-		canvas->render(painter);
+		canvas()->render(painter);
 		painter->end();
 	}else if(fileType == PostScript){
 		printer->setOutputFormat(QPrinter::PostScriptFormat);
@@ -142,7 +142,7 @@ void MainWindow::saveImage(const QString &fileName)
 		painter->setRenderHint(QPainter::SmoothPixmapTransform, true);
 		painter->setRenderHint(QPainter::Antialiasing, true);
 		painter->setRenderHint(QPainter::HighQualityAntialiasing, true);
-		canvas->render(painter);
+		canvas()->render(painter);
 		painter->end();
 	}else{
 		QString message("Unsupported file type:\n\n");
@@ -179,17 +179,23 @@ MainWindow::FileType MainWindow::determineFileType(const QString &fileName)
 void MainWindow::openFile()
 {
 	QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"), QDir::homePath());
-	if(fileName != 0) {
+	if(fileName != 0)
+	{
+		FileParser* p = new FileParser("");
+		Tab* tab = new Tab(p);
 		if(fileName.endsWith(".chmvp"))
 		{
-			openProject(fileName);
-			currentSaveFile = fileName;
+			tab->label = fileName.right(fileName.length() - fileName.lastIndexOf("/") - 1);
+			tab->currentSaveFile = fileName;
+			tab->windowLabel = fileName  + " - cheMVP";
+			openProject(fileName, tab);
+			delete p;
 		}
 		else
 		{
-		   parser->setFileName(fileName);
-		   loadFile();
-		   currentSaveFile = "";
+		   p->setFileName(fileName);
+		   tab->currentSaveFile = "";
+		   loadFile(p, tab);
 		}
 		recentlyOpenedFiles.removeAll(fileName);
 		recentlyOpenedFiles.prepend(fileName);
@@ -233,16 +239,21 @@ void MainWindow::openRecentFile()
 	if(action) {
 		QString fileName = action->data().toString();
 		if(QFile::exists(fileName)) {
+			FileParser* p = new FileParser("");
+			Tab* tab = new Tab(p);
 			if(fileName.endsWith(".chmvp"))
 			{
-				openProject(fileName);
+				tab->label = fileName.right(fileName.length() - fileName.lastIndexOf("/") - 1);
+				tab->windowLabel = fileName + " - cheMVP";
 				currentSaveFile = fileName;
+				openProject(fileName, tab);
+				delete p;
 			}
 			else
 			{
-				parser->setFileName(fileName);
-				loadFile();
-				currentSaveFile = "";
+				p->setFileName(fileName);
+				tab->currentSaveFile = "";
+				loadFile(p, tab);
 			}
 			recentlyOpenedFiles.removeAll(fileName);
 			recentlyOpenedFiles.prepend(fileName);
@@ -254,47 +265,44 @@ void MainWindow::openRecentFile()
 	}
 }
 
-void MainWindow::loadFile()
+void MainWindow::loadFile(FileParser* p, Tab* tab)
 {
-	if (!parser->fileName().isEmpty()) {
-		if(parser->fileName().endsWith(".chmvp"))
+	if (!p->fileName().isEmpty()) {
+		if(p->fileName().endsWith(".chmvp"))
 		{
 			error("Project loading in MainWindow::loadFile()");
 			return;
 		}
-		parser->readFile();
-		canvas->clearAll();
+		p->readFile();
 
-		DrawingCanvas* old_canvas = canvas;
-		DrawingInfo* old_info = drawingInfo;
-		QGraphicsView* old_view = view;
+	/*
+		canvas()->clearAll();
 
-		drawingInfo = new DrawingInfo();
+		DrawingCanvas* old_canvas = canvas();
+		DrawingInfo* old_info = drawingInfo();
+		QGraphicsView* old_view = view();
+*/
+		tab->drawingInfo = new DrawingInfo();
 		// Includes loading canvas from parser
-		canvas = new DrawingCanvas(this->drawingInfo, this->parser);
+		tab->canvas = new DrawingCanvas(tab->drawingInfo, p);
 
-		setWindowTitle(tr("%1 - cheMVP").arg(parser->fileName()));
+		tabWidget->addTab(tab, tab->label);
+		tabWidget->setCurrentIndex(tabWidget->count()-1);
+		tabWidget->setTabText(tabWidget->currentIndex(), tab->label);
+		tabSelected();
 
-		this->view = new DrawingDisplay(canvas, drawingInfo);
-		view->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
-		view->setGeometry(0, 0, static_cast<int>(DEFAULT_SCENE_SIZE_X), static_cast<int>(DEFAULT_SCENE_SIZE_Y));
-//		view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff); // Causes display issues on load
-		view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-		view->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
-
+		/*
+		this->view() = new DrawingDisplay(canvas(), drawingInfo());
+		view()->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+		view()->setGeometry(0, 0, static_cast<int>(DEFAULT_SCENE_SIZE_X), static_cast<int>(DEFAULT_SCENE_SIZE_Y));
+//		view()->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff); // Causes display issues on load
+		view()->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+		view()->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
+*/
 		resetToolBox(NULL);
 		resetSignalsOnFileLoad();
 
-		// Enable the widgets in the animation tab if there are multiple geometries
-		if (parser->numMolecules() <= 1)
-			animationWidget->setEnabled(false);
-		else
-			animationWidget->setEnabled(true);
-
-		// Set the sliders range and current value.
-		animationSlider->setRange(0, parser->numMolecules() - 1);
-		animationSlider->setValue(parser->current());
-
+/*
 		QHBoxLayout* layout = new QHBoxLayout;
 		QByteArray state = splitter->saveState();
 		QSplitter* old_splitter = splitter;
@@ -312,9 +320,10 @@ void MainWindow::loadFile()
 		delete old_view;
 		delete old_splitter;
 		delete old_canvas;
-
+*/
 		activateToolBar();
 	}
+
 }
 
 void MainWindow::saveProject(QString filename)
@@ -336,9 +345,9 @@ void MainWindow::saveProject(QString filename)
 	writer.writeStartDocument();
 	writer.writeStartElement("cheMVP");
 	writer.writeAttribute("version", CHEMVP_VERSION);
-	parser->serialize(&writer);
-	drawingInfo->serialize(&writer);
-	canvas->serialize(&writer);
+	parser()->serialize(&writer);
+	drawingInfo()->serialize(&writer);
+	canvas()->serialize(&writer);
 	writer.writeEndDocument();
 	file.close();
 
@@ -350,7 +359,7 @@ void MainWindow::saveProject(QString filename)
 	}
 }
 
-void MainWindow::openProject(QString filename, bool onNewMainWindow)
+void MainWindow::openProject(QString filename, Tab* tab, bool onNewMainWindow)
 {
 	if(filename.isEmpty())
 		return;
@@ -373,43 +382,49 @@ void MainWindow::openProject(QString filename, bool onNewMainWindow)
 		error("Invalid Version Number!");
 		return;
 	}
-
-	DrawingCanvas* old_canvas = canvas;
-	DrawingInfo* old_info = drawingInfo;
-	QGraphicsView* old_view = view;
-	FileParser* old_parser = parser;
-
+/*
+	DrawingCanvas* old_canvas = canvas();
+	DrawingInfo* old_info = drawingInfo();
+	QGraphicsView* old_view = view();
+	FileParser* old_parser = parser();
+*/
 	// Deserialize
-	this->parser = FileParser::deserialize(&reader);
-	this->drawingInfo = DrawingInfo::deserialize(&reader);
-	this->canvas = DrawingCanvas::deserialize(&reader, drawingInfo, parser);
+	tab->parser = FileParser::deserialize(&reader);
+	tab->drawingInfo = DrawingInfo::deserialize(&reader);
+	tab->canvas = DrawingCanvas::deserialize(&reader, tab->drawingInfo, tab->parser);
 
-	setWindowTitle(tr("%1 - cheMVP").arg(filename));
+	tabWidget->addTab(tab, tab->label);
+	tabWidget->setCurrentIndex(tabWidget->count()-1);
+	tabWidget->setTabText(tabWidget->currentIndex(), tab->label);
+	tabSelected();
 
-	this->view = new DrawingDisplay(canvas, drawingInfo);
-	view->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
-	view->setGeometry(0, 0, static_cast<int>(DEFAULT_SCENE_SIZE_X), static_cast<int>(DEFAULT_SCENE_SIZE_Y));
-	view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-	view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-	view->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
 
+/*	setWindowTitle(tr("%1 - cheMVP").arg(filename));
+
+	this->view() = new DrawingDisplay(canvas(), drawingInfo());
+	view()->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+	view()->setGeometry(0, 0, static_cast<int>(DEFAULT_SCENE_SIZE_X), static_cast<int>(DEFAULT_SCENE_SIZE_Y));
+	view()->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	view()->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	view()->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
+*/
 	QMap<QString, QString>* options = new QMap<QString, QString>();
 
 	// Appearance
-	options->insert("FOGGING_ON", QString("%1").arg(drawingInfo->getUseFogging()));
-	options->insert("FOGGING_SCALE", QString("%1").arg(drawingInfo->getFoggingScale()));
+	options->insert("FOGGING_ON", QString("%1").arg(tab->drawingInfo->getUseFogging()));
+	options->insert("FOGGING_SCALE", QString("%1").arg(tab->drawingInfo->getFoggingScale()));
 	options->insert("X_ROTATION", "0"); // Where are these stored?
 	options->insert("Y_ROTATION", "0"); // They aren't.
 	options->insert("Z_ROTATION", "0"); // Why not? // No idea.
-	options->insert("BACKGROUND_OPACITY", QString("%1").arg(canvas->getBackgroundOpacity()));
-	options->insert("ZOOM", QString("%1").arg(drawingInfo->getZoom()));
+	options->insert("BACKGROUND_OPACITY", QString("%1").arg(tab->canvas->getBackgroundOpacity()));
+	options->insert("ZOOM", QString("%1").arg(tab->drawingInfo->getZoom()));
 
 	// Bonds and Angles
-	options->insert("BOND_LABEL_PRECISION", QString("%1").arg(drawingInfo->getBondPrecision()));
-	options->insert("ANGLE_LABEL_PRECISION", QString("%1").arg(drawingInfo->getAnglePrecision()));
+	options->insert("BOND_LABEL_PRECISION", QString("%1").arg(tab->drawingInfo->getBondPrecision()));
+	options->insert("ANGLE_LABEL_PRECISION", QString("%1").arg(tab->drawingInfo->getAnglePrecision()));
 
 	// Atoms
-	options->insert("ATOM_DRAWING_STYLE", QString("%1").arg(drawingInfo->getDrawingStyle()));
+	options->insert("ATOM_DRAWING_STYLE", QString("%1").arg(tab->drawingInfo->getDrawingStyle()));
 	options->insert("ATOM_LABEL_SIZE", QString("%1").arg(Atom::SmallLabel));
 
 	resetToolBox(options);
@@ -417,15 +432,15 @@ void MainWindow::openProject(QString filename, bool onNewMainWindow)
 	animationSlider->blockSignals(true);
 
 	// Update toolbox widgets
-	if (parser->numMolecules() <= 1)
+	if (parser()->numMolecules() <= 1)
 		animationWidget->setEnabled(false);
 	else
 		animationWidget->setEnabled(true);
-	animationSlider->setRange(0, parser->numMolecules() - 1);
-	animationSlider->setValue(parser->current());
+	animationSlider->setRange(0, tab->parser->numMolecules() - 1);
+	animationSlider->setValue(tab->parser->current());
 
 	animationSlider->blockSignals(false);
-
+/*
 	// Refresh layout
 	QHBoxLayout* layout = new QHBoxLayout;
 	QByteArray state = splitter->saveState();
@@ -440,7 +455,7 @@ void MainWindow::openProject(QString filename, bool onNewMainWindow)
 	QWidget *widget = new QWidget;
 	widget->setLayout(layout);
 	this->setCentralWidget(widget);
-
+*/
 	resetSignalsOnFileLoad();
 
 	reader.readNextStartElement();
@@ -448,12 +463,13 @@ void MainWindow::openProject(QString filename, bool onNewMainWindow)
 		error("Reader: " + reader.errorString());
 	else if(reader.name() != "cheMVP")
 		error("Full document not parsed!");
-
+/*
 	delete old_parser;
 	delete old_info;
 	delete old_view;
 	delete old_splitter;
 	delete old_canvas;
+	*/
 
 	activateToolBar();
 }

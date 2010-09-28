@@ -13,6 +13,7 @@
 #include <QDebug>
 #include <QSettings>
 #include <QMap>
+#include <QTabWidget>
 #include <QXmlStreamWriter>
 #include <QXmlStreamReader>
 #include "splashscreen.h"
@@ -22,6 +23,7 @@
 #include "fileparser.h"
 #include "undo_delete.h"
 #include "preferences.h"
+#include "tab.h"
 
 class MainWindow : public QMainWindow
 {
@@ -35,7 +37,7 @@ public:
 public slots:
 	void setGeometryStep(int);
 	void setCurrentSaveFile(QString file) {currentSaveFile = file;}
-	void openProject(QString filename, bool onNewMainWindow = false);
+	void openProject(QString filename, Tab* tab, bool onNewMainWindow = false);
 	void saveAndExit();
 
 private slots:
@@ -62,6 +64,10 @@ private slots:
 	void aboutCheMVP();
 	void showPreferences();
 	void openRecentFile();
+	void tabSelected();
+	void closeCurrentTab();
+	void tabClosed(int i);
+
 
 private:
 	void focusOutEvent(QFocusEvent *event);
@@ -74,7 +80,7 @@ private:
 	FileType determineFileType(const QString &fileName);
 	void saveImage(const QString &fileName);
 	void foggingToggled(int useFogging);
-	void loadFile();
+	void loadFile(FileParser* p, Tab* tab);
 	void resetSignalsOnFileLoad();
 	void resetButtonsOnFileLoad(bool project);
 	QIcon textToIcon(const QString &string);
@@ -83,6 +89,14 @@ private:
 	void enableLabelSignals();
 	void resetToolBox(QMap<QString, QString>* options);
 	void activateToolBar();
+	void deactivateToolBar();
+	Tab* currentTab() { return static_cast<Tab*>(tabWidget->currentWidget()); };
+
+	// Tab properties
+	DrawingInfo* drawingInfo() { return static_cast<Tab*>(tabWidget->currentWidget())->drawingInfo; };
+	DrawingCanvas* canvas() { return static_cast<Tab*>(tabWidget->currentWidget())->canvas; };
+	FileParser* parser() { return static_cast<Tab*>(tabWidget->currentWidget())->parser; };
+	QGraphicsView* view() { return static_cast<Tab*>(tabWidget->currentWidget())->view; };
 
 	QWidget *createAppearanceWidget(QMap<QString, QString>* options);
 	QWidget *createBondsAndAnglesWidget(QMap<QString, QString>* options);
@@ -107,11 +121,7 @@ private:
 	QToolBar *editToolBar;
 	QToolBar *editSelectedTextToolBar;
 
-	DrawingCanvas *canvas;
-	QGraphicsView *view;
 	QSplitter* splitter;
-	DrawingInfo *drawingInfo;
-	FileParser *parser;
 
 	QComboBox *atomLabelFontSizeCombo;
 	QComboBox *textFontSizeCombo;
@@ -122,6 +132,7 @@ private:
 	QActionGroup *insertTextActionGroup;
 	QAction *deleteAction;
 	QAction *openAction;
+	QAction *closeAction;
 	QAction *exitAction;
 	QAction *saveAction;
 	QAction *saveAsAction;
@@ -186,6 +197,9 @@ private:
 	QList<QString> recentlyOpenedFiles;
 	QList<QAction*> recentFileActions;
 	QAction* separatorAction;
+
+	QTabWidget* tabWidget;
+	QHBoxLayout* layout;
 };
 
 #endif

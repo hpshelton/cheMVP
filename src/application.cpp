@@ -1,4 +1,3 @@
-#include "mainwindow.h"
 #include "application.h"
 
 using namespace std;
@@ -29,14 +28,14 @@ bool Application::loadFile(const QString &fileName)
 
 	// New program launch from file open
 	bool newWindow = false;
+	FileParser* parser = new FileParser("");
 	if(this->mainWindow == NULL)
 	{
-		FileParser *parser = new FileParser("");
 		this->mainWindow = new MainWindow(parser);
 		newWindow = true;
 	}
-
-	this->mainWindow->openProject(fileName, newWindow);
+	Tab* tab = new Tab(parser);
+	this->mainWindow->openProject(fileName, tab, newWindow);
 	this->mainWindow->raise();
 	this->mainWindow->showNormal();
 
