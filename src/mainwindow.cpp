@@ -23,11 +23,9 @@ MainWindow::MainWindow(FileParser *parser_in)
 	tabWidget->setGeometry(0, 0, static_cast<int>(DEFAULT_SCENE_SIZE_X), static_cast<int>(DEFAULT_SCENE_SIZE_Y));
 	tabWidget->setDocumentMode(true);
 	tabWidget->setTabsClosable(true);
+	tabWidget->setMovable(true);
 	connect(tabWidget, SIGNAL(currentChanged(int)), this, SLOT(tabSelected()));
 	connect(tabWidget, SIGNAL(tabCloseRequested(int)), this, SLOT(tabClosed(int)));
-
-//	Tab* defaultTab = new Tab(parser_in);
-//	tabWidget->addTab(defaultTab, defaultTab->label);
 
 	Atom::fillLabelToVdwRadiusMap();
 	Atom::fillLabelToMassMap();
@@ -53,12 +51,6 @@ MainWindow::MainWindow(FileParser *parser_in)
 	QWidget* centerWidget = new QWidget;
 	centerWidget->setLayout(layout);
 	setCentralWidget(centerWidget);
-
-	// The undo/redo framework needs to update the buttons appropriately
-	connect(undoStack, SIGNAL(canRedoChanged(bool)), redoAction, SLOT(setEnabled(bool)));
-	connect(undoStack, SIGNAL(canUndoChanged(bool)), undoAction, SLOT(setEnabled(bool)));
-
-//	resetSignalsOnFileLoad();
 
 	this->setWindowIconText("cheMVP");
 	this->setWindowTitle("cheMVP");
@@ -324,25 +316,16 @@ void MainWindow::resetSignalsOnFileLoad()
 	mouseModeButtonGroupClicked(mouseModeButtonGroup->checkedId());
 }
 
-void MainWindow::mouseReleaseEvent(QMouseEvent* e)
-{
-	Q_UNUSED(e);
-	updateTextLabelToolbar();
-}
-
 void MainWindow::tabSelected()
 {
 	if(tabWidget->count() > 0)
 	{
 		currentTab()->update();
 		QString s = currentTab()->windowLabel;
-	//	if(!s.isEmpty())
-	//		setWindowTitle(tr("%1 - cheMVP").arg(s));
-	//	else
-	//		setWindowTitle(tr("cheMVP"));
 		this->setWindowTitle(s);
 
 		// Enable the widgets in the animation tab if there are multiple geometries
+		animationSlider->blockSignals(true);
 		if (parser()->numMolecules() <= 1)
 			animationWidget->setEnabled(false);
 		else
@@ -351,6 +334,7 @@ void MainWindow::tabSelected()
 		// Set the sliders range and current value.
 		animationSlider->setRange(0, parser()->numMolecules() - 1);
 		animationSlider->setValue(parser()->current());
+		animationSlider->blockSignals(false);
 
 		resetSignalsOnFileLoad();
 	}
@@ -358,7 +342,7 @@ void MainWindow::tabSelected()
 
 void MainWindow::tabClosed(int i)
 {
-	Tab* tab = currentTab();
+	Tab* tab = static_cast<Tab*>(tabWidget->widget(i));
 	tabWidget->removeTab(i);
 
 	if(!tabWidget->count())
@@ -368,4 +352,5 @@ void MainWindow::tabClosed(int i)
 	delete tab->view;
 	delete tab->canvas;
 	delete tab->parser;
+	delete tab;
 }

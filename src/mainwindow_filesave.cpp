@@ -275,13 +275,6 @@ void MainWindow::loadFile(FileParser* p, Tab* tab)
 		}
 		p->readFile();
 
-	/*
-		canvas()->clearAll();
-
-		DrawingCanvas* old_canvas = canvas();
-		DrawingInfo* old_info = drawingInfo();
-		QGraphicsView* old_view = view();
-*/
 		tab->drawingInfo = new DrawingInfo();
 		// Includes loading canvas from parser
 		tab->canvas = new DrawingCanvas(tab->drawingInfo, p);
@@ -291,36 +284,9 @@ void MainWindow::loadFile(FileParser* p, Tab* tab)
 		tabWidget->setTabText(tabWidget->currentIndex(), tab->label);
 		tabSelected();
 
-		/*
-		this->view() = new DrawingDisplay(canvas(), drawingInfo());
-		view()->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
-		view()->setGeometry(0, 0, static_cast<int>(DEFAULT_SCENE_SIZE_X), static_cast<int>(DEFAULT_SCENE_SIZE_Y));
-//		view()->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff); // Causes display issues on load
-		view()->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-		view()->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
-*/
 		resetToolBox(NULL);
 		resetSignalsOnFileLoad();
 
-/*
-		QHBoxLayout* layout = new QHBoxLayout;
-		QByteArray state = splitter->saveState();
-		QSplitter* old_splitter = splitter;
-		splitter = new QSplitter(Qt::Horizontal);
-		splitter->addWidget(view);
-		splitter->addWidget(toolBox);
-		splitter->restoreState(state);
-		layout->addWidget(splitter);
-
-		QWidget *widget = new QWidget;
-		widget->setLayout(layout);
-		this->setCentralWidget(widget);
-
-		delete old_info;
-		delete old_view;
-		delete old_splitter;
-		delete old_canvas;
-*/
 		activateToolBar();
 	}
 
@@ -382,12 +348,7 @@ void MainWindow::openProject(QString filename, Tab* tab, bool onNewMainWindow)
 		error("Invalid Version Number!");
 		return;
 	}
-/*
-	DrawingCanvas* old_canvas = canvas();
-	DrawingInfo* old_info = drawingInfo();
-	QGraphicsView* old_view = view();
-	FileParser* old_parser = parser();
-*/
+
 	// Deserialize
 	tab->parser = FileParser::deserialize(&reader);
 	tab->drawingInfo = DrawingInfo::deserialize(&reader);
@@ -399,15 +360,6 @@ void MainWindow::openProject(QString filename, Tab* tab, bool onNewMainWindow)
 	tabSelected();
 
 
-/*	setWindowTitle(tr("%1 - cheMVP").arg(filename));
-
-	this->view() = new DrawingDisplay(canvas(), drawingInfo());
-	view()->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
-	view()->setGeometry(0, 0, static_cast<int>(DEFAULT_SCENE_SIZE_X), static_cast<int>(DEFAULT_SCENE_SIZE_Y));
-	view()->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-	view()->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-	view()->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
-*/
 	QMap<QString, QString>* options = new QMap<QString, QString>();
 
 	// Appearance

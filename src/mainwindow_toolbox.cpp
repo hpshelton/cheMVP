@@ -18,6 +18,8 @@ void MainWindow::createToolBox(int width, int height)
 
 	toolBox->setGeometry(0, 0, width, height);
 	toolBox->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+
+	delete options;
 }
 
 QWidget *MainWindow::createAppearanceWidget(QMap<QString, QString>* options)

@@ -14,8 +14,11 @@ void MainWindow::createActions()
 	redoAction->setEnabled(false);
 	connect(redoAction, SIGNAL(triggered()), undoStack, SLOT(redo()));
 
-	deleteAction = new QAction(QIcon(":/images/delete.png"),
-							   tr("&Delete"), this);
+	// The undo/redo framework needs to update the buttons appropriately
+	connect(undoStack, SIGNAL(canRedoChanged(bool)), redoAction, SLOT(setEnabled(bool)));
+	connect(undoStack, SIGNAL(canUndoChanged(bool)), undoAction, SLOT(setEnabled(bool)));
+
+	deleteAction = new QAction(QIcon(":/images/delete.png"), tr("&Delete"), this);
 	deleteAction->setShortcut(tr("Delete"));
 	deleteAction->setEnabled(false);
 	deleteAction->setStatusTip(tr("Delete selected item(s) from drawing"));
@@ -27,7 +30,7 @@ void MainWindow::createActions()
 	connect(openAction, SIGNAL(triggered()), this, SLOT(openFile()));
 
 	closeAction = new QAction(tr("&Close"), this);
-	closeAction->setShortcut(tr("Close this file"));
+	closeAction->setStatusTip(tr("Close this file"));
 	closeAction->setShortcut(tr("Ctrl+W"));
 	connect(closeAction, SIGNAL(triggered()), this, SLOT(closeCurrentTab()));
 
@@ -129,5 +132,6 @@ void MainWindow::showPreferences()
 
 void MainWindow::closeCurrentTab()
 {
-	this->tabClosed(this->tabWidget->currentIndex());
+	if(this->tabWidget->count() > 0)
+		this->tabClosed(this->tabWidget->currentIndex());
 }

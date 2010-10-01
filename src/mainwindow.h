@@ -84,7 +84,6 @@ private:
 	void resetSignalsOnFileLoad();
 	void resetButtonsOnFileLoad(bool project);
 	QIcon textToIcon(const QString &string);
-	void mouseReleaseEvent(QMouseEvent *);
 	void disableLabelSignals();
 	void enableLabelSignals();
 	void resetToolBox(QMap<QString, QString>* options);
@@ -93,10 +92,10 @@ private:
 	Tab* currentTab() { return static_cast<Tab*>(tabWidget->currentWidget()); };
 
 	// Tab properties
-	DrawingInfo* drawingInfo() { return static_cast<Tab*>(tabWidget->currentWidget())->drawingInfo; };
-	DrawingCanvas* canvas() { return static_cast<Tab*>(tabWidget->currentWidget())->canvas; };
-	FileParser* parser() { return static_cast<Tab*>(tabWidget->currentWidget())->parser; };
-	QGraphicsView* view() { return static_cast<Tab*>(tabWidget->currentWidget())->view; };
+	DrawingInfo* drawingInfo() { return currentTab()->drawingInfo; };
+	DrawingCanvas* canvas() { return currentTab()->canvas; };
+	FileParser* parser() { return currentTab()->parser; };
+	QGraphicsView* view() { return currentTab()->view; };
 
 	QWidget *createAppearanceWidget(QMap<QString, QString>* options);
 	QWidget *createBondsAndAnglesWidget(QMap<QString, QString>* options);
