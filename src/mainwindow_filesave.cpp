@@ -283,6 +283,7 @@ void MainWindow::loadFile(FileParser* p, Tab* tab)
 		tabWidget->setCurrentIndex(tabWidget->count()-1);
 		tabWidget->setTabText(tabWidget->currentIndex(), tab->label);
 		tabSelected();
+		previousTab = tabWidget->currentIndex();
 
 		resetToolBox(NULL);
 		resetSignalsOnFileLoad();
@@ -358,7 +359,7 @@ void MainWindow::openProject(QString filename, Tab* tab, bool onNewMainWindow)
 	tabWidget->setCurrentIndex(tabWidget->count()-1);
 	tabWidget->setTabText(tabWidget->currentIndex(), tab->label);
 	tabSelected();
-
+	previousTab = tabWidget->currentIndex();
 
 	QMap<QString, QString>* options = new QMap<QString, QString>();
 
@@ -392,22 +393,7 @@ void MainWindow::openProject(QString filename, Tab* tab, bool onNewMainWindow)
 	animationSlider->setValue(tab->parser->current());
 
 	animationSlider->blockSignals(false);
-/*
-	// Refresh layout
-	QHBoxLayout* layout = new QHBoxLayout;
-	QByteArray state = splitter->saveState();
-	QSplitter* old_splitter = splitter;
-	splitter = new QSplitter(Qt::Horizontal);
-	splitter->addWidget(view);
-	splitter->addWidget(toolBox);
-	if(!onNewMainWindow)
-		splitter->restoreState(state);
-	layout->addWidget(splitter);
 
-	QWidget *widget = new QWidget;
-	widget->setLayout(layout);
-	this->setCentralWidget(widget);
-*/
 	resetSignalsOnFileLoad();
 
 	reader.readNextStartElement();
@@ -415,13 +401,6 @@ void MainWindow::openProject(QString filename, Tab* tab, bool onNewMainWindow)
 		error("Reader: " + reader.errorString());
 	else if(reader.name() != "cheMVP")
 		error("Full document not parsed!");
-/*
-	delete old_parser;
-	delete old_info;
-	delete old_view;
-	delete old_splitter;
-	delete old_canvas;
-	*/
 
 	activateToolBar();
 }

@@ -49,10 +49,11 @@ int main(int argv, char *args[])
 		app.mainWindow->raise();
 		app.mainWindow->showNormal();
 
-		if(argv == 3){
+		// Command line functionality temporarily broken by tab functionality - HPS
+		/*if(argv == 3){
 			app.mainWindow->setCurrentSaveFile(args[2]);
 			app.mainWindow->saveAndExit();
-		}
+		}*/
 	}
 
 	return app.exec();

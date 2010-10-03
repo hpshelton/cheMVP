@@ -34,7 +34,12 @@ bool Application::loadFile(const QString &fileName)
 		this->mainWindow = new MainWindow(parser);
 		newWindow = true;
 	}
+
 	Tab* tab = new Tab(parser);
+	tab->label = fileName.right(fileName.length() - fileName.lastIndexOf("/") - 1);
+	tab->currentSaveFile = fileName;
+	tab->windowLabel = fileName  + " - cheMVP";
+
 	this->mainWindow->openProject(fileName, tab, newWindow);
 	this->mainWindow->raise();
 	this->mainWindow->showNormal();

@@ -10,8 +10,6 @@
 
 MainWindow::MainWindow(FileParser *parser_in)
 {
-	undoStack = new QUndoStack();
-
 	createActions();
 	createToolBox();
 	createMenus();
@@ -114,6 +112,7 @@ void MainWindow::setLabelBoldness(bool bold)
 	}
 	drawingInfo()->determineScaleFactor();
 	canvas()->refresh();
+	currentTab()->toolBarState->setBold(bold);
 }
 
 void MainWindow::setLabelItalics(bool italic)
@@ -129,6 +128,7 @@ void MainWindow::setLabelItalics(bool italic)
 	}
 	drawingInfo()->determineScaleFactor();
 	canvas()->refresh();
+	currentTab()->toolBarState->setItalic(italic);
 }
 
 void MainWindow::setLabelUnderline(bool underline)
@@ -144,6 +144,7 @@ void MainWindow::setLabelUnderline(bool underline)
 	}
 	drawingInfo()->determineScaleFactor();
 	canvas()->refresh();
+	currentTab()->toolBarState->setUnderline(underline);
 }
 
 void MainWindow::setLabelFont(QFont font)
@@ -159,6 +160,7 @@ void MainWindow::setLabelFont(QFont font)
 	}
 	drawingInfo()->determineScaleFactor();
 	canvas()->refresh();
+	currentTab()->toolBarState->setFont(font);
 }
 
 void MainWindow::setLabelFontSize(QString size)
@@ -174,6 +176,7 @@ void MainWindow::setLabelFontSize(QString size)
 	}
 	drawingInfo()->determineScaleFactor();
 	canvas()->refresh();
+	currentTab()->toolBarState->setFontSize(size);
 }
 
 void MainWindow::mouseModeButtonGroupClicked(int buttonID)
@@ -185,22 +188,25 @@ void MainWindow::mouseModeButtonGroupClicked(int buttonID)
 		}
 	}
 
-	canvas()->setMode(DrawingCanvas::Mode(mouseModeButtonGroup->checkedId()));
-	if(mouseModeButtonGroup->checkedId() == DrawingCanvas::Rotate){
+	int checkedButton = mouseModeButtonGroup->checkedId();
+	canvas()->setMode(DrawingCanvas::Mode(checkedButton));
+	currentTab()->toolBarState->setMouseMode(checkedButton);
+
+	if(checkedButton == DrawingCanvas::Rotate){
 		canvas()->setAcceptsHovers(false);
 	}else{
 		canvas()->setAcceptsHovers(true);
 	}
-	if(mouseModeButtonGroup->checkedId() == DrawingCanvas::Rotate){
+	if(checkedButton == DrawingCanvas::Rotate){
 		view()->setCursor(canvas()->rotateCursor());
 	}
-	if(mouseModeButtonGroup->checkedId() == DrawingCanvas::AddText){
+	if(checkedButton == DrawingCanvas::AddText){
 		view()->setCursor(Qt::IBeamCursor);
 	}
-	if(mouseModeButtonGroup->checkedId() == DrawingCanvas::Select){
+	if(checkedButton == DrawingCanvas::Select){
 		view()->setCursor(Qt::ArrowCursor);
 	}
-	if(mouseModeButtonGroup->checkedId() == DrawingCanvas::AddBond){
+	if(checkedButton == DrawingCanvas::AddBond){
 		view()->setCursor(Qt::ArrowCursor);
 	}
 }
@@ -324,6 +330,8 @@ void MainWindow::tabSelected()
 		QString s = currentTab()->windowLabel;
 		this->setWindowTitle(s);
 
+		this->setToolBarProperties(currentTab()->toolBarState);
+
 		// Enable the widgets in the animation tab if there are multiple geometries
 		animationSlider->blockSignals(true);
 		if (parser()->numMolecules() <= 1)
@@ -337,6 +345,19 @@ void MainWindow::tabSelected()
 		animationSlider->blockSignals(false);
 
 		resetSignalsOnFileLoad();
+
+		undoAction->disconnect();
+		redoAction->disconnect();
+
+		// Handle undo stack switching
+		connect(undoAction, SIGNAL(triggered()), undoStack(), SLOT(undo()));
+		connect(redoAction, SIGNAL(triggered()), undoStack(), SLOT(redo()));
+
+		connect(undoStack(), SIGNAL(canRedoChanged(bool)), redoAction, SLOT(setEnabled(bool)));
+		connect(undoStack(), SIGNAL(canUndoChanged(bool)), undoAction, SLOT(setEnabled(bool)));
+
+		redoAction->setEnabled(undoStack()->canRedo());
+		undoAction->setEnabled(undoStack()->canUndo());
 	}
 }
 
@@ -353,4 +374,6 @@ void MainWindow::tabClosed(int i)
 	delete tab->canvas;
 	delete tab->parser;
 	delete tab;
+
+	previousTab = tabWidget->currentIndex();
 }

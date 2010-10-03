@@ -5,18 +5,12 @@ void MainWindow::createActions()
 	undoAction = new QAction(QIcon(":/images/undo.png"),tr("&Undo"), this);
 	undoAction->setShortcut(tr("Ctrl+Z"));
 	undoAction->setEnabled(false);
-	connect(undoAction, SIGNAL(triggered()), undoStack, SLOT(undo()));
 
 	redoAction = new QAction(QIcon(":/images/redo.png"), tr("&Redo"), this);
 	QList<QKeySequence> redoShortcuts;
 	redoShortcuts << tr("Ctrl+Y") << tr("Shift+Ctrl+Z");
 	redoAction->setShortcuts(redoShortcuts);
 	redoAction->setEnabled(false);
-	connect(redoAction, SIGNAL(triggered()), undoStack, SLOT(redo()));
-
-	// The undo/redo framework needs to update the buttons appropriately
-	connect(undoStack, SIGNAL(canRedoChanged(bool)), redoAction, SLOT(setEnabled(bool)));
-	connect(undoStack, SIGNAL(canUndoChanged(bool)), undoAction, SLOT(setEnabled(bool)));
 
 	deleteAction = new QAction(QIcon(":/images/delete.png"), tr("&Delete"), this);
 	deleteAction->setShortcut(tr("Delete"));
@@ -114,7 +108,7 @@ void MainWindow::deleteItem()
 	}
 
 	QUndoCommand *removeItemCommand = new RemoveItemCommand(canvas());
-	undoStack->push(removeItemCommand);
+	undoStack()->push(removeItemCommand);
 }
 
 void MainWindow::aboutCheMVP()
@@ -126,8 +120,9 @@ void MainWindow::aboutCheMVP()
 
 void MainWindow::showPreferences()
 {
-	Preferences* prefs = new Preferences(canvas(), drawingInfo()->getDrawingStyle());
-	prefs->exec();
+	// Preferences broken by tabs
+	//Preferences* prefs = new Preferences(canvas(), drawingInfo()->getDrawingStyle());
+	//prefs->exec();
 }
 
 void MainWindow::closeCurrentTab()

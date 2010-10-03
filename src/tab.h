@@ -4,6 +4,7 @@
 #include "drawinginfo.h"
 #include "drawingcanvas.h"
 #include "drawingdisplay.h"
+#include "toolBarState.h"
 
 #ifndef TAB_H
 #define TAB_H
@@ -18,6 +19,8 @@ public:
 	QString label;
 	QString windowLabel;
 	QString currentSaveFile;
+	ToolBarState* toolBarState;
+	QUndoStack* undoStack;
 
 public:
 	Tab(FileParser* parser);

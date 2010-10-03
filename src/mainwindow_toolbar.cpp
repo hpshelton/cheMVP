@@ -148,7 +148,6 @@ void MainWindow::updateTextLabelToolbar()
 		boldTextButton->setEnabled(false);
 		italicTextButton->setEnabled(false);
 		underlineTextButton->setEnabled(false);
-		return;
 	}
 	else if(selectedLabels == 1)
 	{
@@ -279,6 +278,11 @@ void MainWindow::updateTextLabelToolbar()
 		}
 	}
 
+	currentTab()->toolBarState->setTextEditing(textFontSizeCombo->isEnabled());
+	currentTab()->toolBarState->setBold(boldTextButton->isChecked());
+	currentTab()->toolBarState->setItalic(italicTextButton->isChecked());
+	currentTab()->toolBarState->setUnderline(underlineTextButton->isChecked());
+
 	enableLabelSignals();
 }
 
@@ -299,8 +303,8 @@ void MainWindow::activateToolBar()
 	addArrowAction->setEnabled(true);
 	insertTextActionGroup->setEnabled(true);
 
-	if(undoStack->count() > 0)
-		undoStack->clear();
+	if(undoStack()->count() > 0)
+		undoStack()->clear();
 }
 
 void MainWindow::deactivateToolBar()
@@ -325,6 +329,33 @@ void MainWindow::deactivateToolBar()
 	boldTextButton->setEnabled(false);
 	italicTextButton->setEnabled(false);
 	underlineTextButton->setEnabled(false);
+}
 
-	undoStack->clear();
+void MainWindow::setToolBarProperties(ToolBarState* state)
+{
+	this->mouseModeButtonGroup->button(state->getMouseMode())->setChecked(true);
+
+	bool editing = state->getTextEditing();
+
+	this->textFontCombo->setCurrentFont(state->getFont());
+	this->textFontSizeCombo->setCurrentIndex(this->textFontSizeCombo->findText(state->getFontSize()));
+
+	this->textFontCombo->setEnabled(editing);
+	this->textFontSizeCombo->setEnabled(editing);
+	this->boldTextButton->setEnabled(editing);
+	this->underlineTextButton->setEnabled(editing);
+	this->italicTextButton->setEnabled(editing);
+
+	if(editing)
+	{
+		this->boldTextButton->setChecked(state->getBold());
+		this->italicTextButton->setChecked(state->getItalic());
+		this->underlineTextButton->setChecked(state->getUnderline());
+	}
+	else
+	{
+		this->boldTextButton->setChecked(false);
+		this->italicTextButton->setChecked(false);
+		this->underlineTextButton->setChecked(false);
+	}
 }

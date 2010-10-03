@@ -24,6 +24,7 @@
 #include "undo_delete.h"
 #include "preferences.h"
 #include "tab.h"
+#include "toolbarstate.h"
 
 class MainWindow : public QMainWindow
 {
@@ -68,7 +69,6 @@ private slots:
 	void closeCurrentTab();
 	void tabClosed(int i);
 
-
 private:
 	void focusOutEvent(QFocusEvent *event);
 	void createToolBox(int width = DEFAULT_TOOLBOX_WIDTH, int height = DEFAULT_SCENE_SIZE_Y);
@@ -90,12 +90,14 @@ private:
 	void activateToolBar();
 	void deactivateToolBar();
 	Tab* currentTab() { return static_cast<Tab*>(tabWidget->currentWidget()); };
+	void setToolBarProperties(ToolBarState* state);
 
 	// Tab properties
 	DrawingInfo* drawingInfo() { return currentTab()->drawingInfo; };
 	DrawingCanvas* canvas() { return currentTab()->canvas; };
 	FileParser* parser() { return currentTab()->parser; };
 	QGraphicsView* view() { return currentTab()->view; };
+	QUndoStack* undoStack() { return currentTab()->undoStack; };
 
 	QWidget *createAppearanceWidget(QMap<QString, QString>* options);
 	QWidget *createBondsAndAnglesWidget(QMap<QString, QString>* options);
@@ -191,14 +193,13 @@ private:
 
 	QToolBox *toolBox;
 
-	QUndoStack *undoStack;
-
 	QList<QString> recentlyOpenedFiles;
 	QList<QAction*> recentFileActions;
 	QAction* separatorAction;
 
 	QTabWidget* tabWidget;
 	QHBoxLayout* layout;
+	int previousTab;
 };
 
 #endif

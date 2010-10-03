@@ -5,6 +5,8 @@ Tab::Tab(FileParser* parser)
 	this->currentSaveFile = "";
 	this->label = "";
 	this->windowLabel = "";
+	this->toolBarState = new ToolBarState();
+	this->undoStack = new QUndoStack();
 	this->parser = parser;
 	this->drawingInfo = new DrawingInfo();
 	this->canvas = new DrawingCanvas(this->drawingInfo, this->parser);
