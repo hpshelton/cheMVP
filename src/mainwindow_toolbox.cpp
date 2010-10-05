@@ -365,9 +365,19 @@ void MainWindow::resetToolBox(QMap<QString, QString>* options)
 	useFoggingBox->setChecked(useFogging);
 	foggingLabel->setVisible(useFogging);
 	foggingScaleBox->setValue(options->value("FOGGING_SCALE").toInt());
+
+	xRotationBox->blockSignals(true);
 	xRotationBox->setText(options->value("X_ROTATION"));
+	xRotationBox->blockSignals(false);
+
+	yRotationBox->blockSignals(true);
 	yRotationBox->setText(options->value("Y_ROTATION"));
+	yRotationBox->blockSignals(false);
+
+	zRotationBox->blockSignals(true);
 	zRotationBox->setText(options->value("Z_ROTATION"));
+	zRotationBox->blockSignals(false);
+
 	backgroundOpacitySpinBox->setValue(options->value("BACKGROUND_OPACITY").toInt());
 	zoomSpinBox->setValue(options->value("ZOOM").toInt());
 	bondLabelsPrecisionBox->setValue(options->value("BOND_LABEL_PRECISION").toInt());

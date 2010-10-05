@@ -1,13 +1,14 @@
+#ifndef TAB_H
+#define TAB_H
+
 #include <QHBoxLayout>
 #include <QGraphicsView>
 #include <QWidget>
 #include "drawinginfo.h"
 #include "drawingcanvas.h"
 #include "drawingdisplay.h"
-#include "toolBarState.h"
-
-#ifndef TAB_H
-#define TAB_H
+#include "toolbarstate.h"
+#include "toolboxstate.h"
 
 class Tab : public QWidget
 {
@@ -20,6 +21,7 @@ public:
 	QString windowLabel;
 	QString currentSaveFile;
 	ToolBarState* toolBarState;
+	ToolBoxState* toolBoxState;
 	QUndoStack* undoStack;
 
 public:

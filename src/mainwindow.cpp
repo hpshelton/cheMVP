@@ -223,10 +223,16 @@ void MainWindow::setGeometryStep(int geom)
 
 void MainWindow::rotateFromInitialCoordinates()
 {
-	drawingInfo()->setXRot(xRotationBox->text().toInt());
-	drawingInfo()->setYRot(yRotationBox->text().toInt());
-	drawingInfo()->setZRot(zRotationBox->text().toInt());
+	int x = xRotationBox->text().toInt();
+	int y = yRotationBox->text().toInt();
+	int z = zRotationBox->text().toInt();
+	drawingInfo()->setXRot(x);
+	drawingInfo()->setYRot(y);
+	drawingInfo()->setZRot(z);
 	canvas()->rotateFromInitialCoordinates();
+	currentTab()->toolBoxState->setXRotation(x);
+	currentTab()->toolBoxState->setYRotation(y);
+	currentTab()->toolBoxState->setZRotation(z);
 }
 
 void MainWindow::setAddArrowMode()
@@ -258,7 +264,6 @@ void MainWindow::changeAtomSize()
 	}
 }
 
-
 void MainWindow::foggingToggled(int useFogging)
 {
 	drawingInfo()->setUseFogging(useFogging);
@@ -266,7 +271,6 @@ void MainWindow::foggingToggled(int useFogging)
 	useFoggingBox->setVisible(false);
 	std::cout<<"I was called!"<<std::endl;
 }
-
 
 void MainWindow::changeBondSize()
 {
@@ -291,31 +295,82 @@ void MainWindow::changeZoom(int val)
 {
 	drawingInfo()->setZoom(val);
 	canvas()->refresh();
+	currentTab()->toolBoxState->setZoom(val);
+}
+
+void MainWindow::setUseFogging(bool b)
+{
+	drawingInfo()->setUseFogging(b);
+	currentTab()->toolBoxState->setUseFogging(b);
+}
+
+void MainWindow::setFoggingScale(int i)
+{
+	drawingInfo()->setFoggingScale(i);
+	currentTab()->toolBoxState->setFoggingScale(i);
+}
+
+void MainWindow::setBackgroundOpacity(int i)
+{
+	canvas()->setBackgroundOpacity(i);
+	currentTab()->toolBoxState->setBackgroundOpacity(i);
 }
 
 void MainWindow::resetSignalsOnFileLoad()
 {
 	connect(canvas(), SIGNAL(selectionChanged()), this, SLOT(updateMenus()));
-	connect(selectAllAction, SIGNAL(triggered()), canvas(), SLOT(selectAll()));
-	connect(unselectAllAction, SIGNAL(triggered()), canvas(), SLOT(unselectAll()));
 	connect(canvas(), SIGNAL(mouseModeChanged(int)), this, SLOT(mouseModeButtonGroupClicked(int)));
 	connect(canvas(), SIGNAL(updateTextToolbars()), this, SLOT(updateTextLabelToolbar()));
-	connect(useFoggingBox, SIGNAL(toggled(bool)), drawingInfo(), SLOT(setUseFogging(bool)));
+
+	disconnect(selectAllAction, 0, 0, 0);
+	connect(selectAllAction, SIGNAL(triggered()), canvas(), SLOT(selectAll()));
+
+	disconnect(unselectAllAction, 0, 0, 0);
+	connect(unselectAllAction, SIGNAL(triggered()), canvas(), SLOT(unselectAll()));
+
+	connect(useFoggingBox, SIGNAL(toggled(bool)), this, SLOT(setUseFogging(bool)));
 	connect(useFoggingBox, SIGNAL(toggled(bool)), canvas(), SLOT(refresh()));
-	connect(foggingScaleBox, SIGNAL(valueChanged(int)), drawingInfo(), SLOT(setFoggingScale(int)));
+
+	connect(foggingScaleBox, SIGNAL(valueChanged(int)), this, SLOT(setFoggingScale(int)));
 	connect(foggingScaleBox, SIGNAL(valueChanged(int)), canvas(), SLOT(refresh()));
+
+	disconnect(backgroundColorButton, 0, 0, 0);
 	connect(backgroundColorButton, SIGNAL(clicked()), canvas(), SLOT(setBackgroundColor()));
-	connect(backgroundOpacitySpinBox, SIGNAL(valueChanged(int)), canvas(), SLOT(setBackgroundOpacity(int)));
+
+	disconnect(backgroundOpacitySpinBox, 0, 0, 0);
+	connect(backgroundOpacitySpinBox, SIGNAL(valueChanged(int)), this, SLOT(setBackgroundOpacity(int)));
+
+	disconnect(toggleBondLabelsButton, 0, 0, 0);
 	connect(toggleBondLabelsButton, SIGNAL(pressed()), canvas(), SLOT(toggleBondLabels()));
+
+	disconnect(bondLabelsPrecisionBox, 0, 0, 0);
 	connect(bondLabelsPrecisionBox, SIGNAL(valueChanged(int)), canvas(), SLOT(setBondLabelPrecision(int)));
+
+	disconnect(toggleAngleLabelsButton, 0, 0, 0);
 	connect(toggleAngleLabelsButton, SIGNAL(pressed()), canvas(), SLOT(toggleAngleLabels()));
+
+	disconnect(angleLabelsPrecisionBox, 0, 0, 0);
 	connect(angleLabelsPrecisionBox, SIGNAL(valueChanged(int)), canvas(), SLOT(setAngleLabelPrecision(int)));
+
+	disconnect(toggleBondDashingButton, 0, 0, 0);
 	connect(toggleBondDashingButton, SIGNAL(pressed()), canvas(), SLOT(toggleBondDashing()));
+
+	disconnect(atomColorButton, 0, 0, 0);
 	connect(atomColorButton, SIGNAL(clicked()), canvas(), SLOT(setAtomColors()));
+
+	disconnect(atomDrawingStyleButtonGroup, 0, 0, 0);
 	connect(atomDrawingStyleButtonGroup, SIGNAL(buttonClicked(int)), canvas(), SLOT(setAtomDrawingStyle(int)));
+
+	disconnect(atomDrawingStyleButtonGroup, 0, 0, 0);
 	connect(toggleAtomNumberSubscriptsButton, SIGNAL(pressed()), canvas(), SLOT(toggleAtomNumberSubscripts()));
+
+	disconnect(atomLabelFontCombo, 0, 0, 0);
 	connect(atomLabelFontCombo, SIGNAL(currentFontChanged(const QFont &)), canvas(), SLOT(atomLabelFontChanged(const QFont &)));
+
+	disconnect(atomLabelFontSizeCombo, 0, 0, 0);
 	connect(atomLabelFontSizeCombo, SIGNAL(currentIndexChanged(const QString &)), canvas(), SLOT(atomLabelFontSizeChanged(const QString &)));
+
+	disconnect(atomFontSizeButtonGroup, 0, 0, 0);
 	connect(atomFontSizeButtonGroup, SIGNAL(buttonClicked(int)), canvas(), SLOT(setAtomFontSizeStyle(int)));
 
 	// Re-sync toolbar to (possibly) new canvas
@@ -331,6 +386,7 @@ void MainWindow::tabSelected()
 		this->setWindowTitle(s);
 
 		this->setToolBarProperties(currentTab()->toolBarState);
+		this->resetToolBox(currentTab()->toolBoxState->options());
 
 		// Enable the widgets in the animation tab if there are multiple geometries
 		animationSlider->blockSignals(true);

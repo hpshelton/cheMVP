@@ -68,6 +68,9 @@ private slots:
 	void tabSelected();
 	void closeCurrentTab();
 	void tabClosed(int i);
+	void setUseFogging(bool b);
+	void setFoggingScale(int i);
+	void setBackgroundOpacity(int i);
 
 private:
 	void focusOutEvent(QFocusEvent *event);

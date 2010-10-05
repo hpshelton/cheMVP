@@ -282,11 +282,10 @@ void MainWindow::loadFile(FileParser* p, Tab* tab)
 		tabWidget->addTab(tab, tab->label);
 		tabWidget->setCurrentIndex(tabWidget->count()-1);
 		tabWidget->setTabText(tabWidget->currentIndex(), tab->label);
-		tabSelected();
+		//tabSelected();
 		previousTab = tabWidget->currentIndex();
 
 		resetToolBox(NULL);
-		resetSignalsOnFileLoad();
 
 		activateToolBar();
 	}
@@ -358,7 +357,7 @@ void MainWindow::openProject(QString filename, Tab* tab, bool onNewMainWindow)
 	tabWidget->addTab(tab, tab->label);
 	tabWidget->setCurrentIndex(tabWidget->count()-1);
 	tabWidget->setTabText(tabWidget->currentIndex(), tab->label);
-	tabSelected();
+//	tabSelected();
 	previousTab = tabWidget->currentIndex();
 
 	QMap<QString, QString>* options = new QMap<QString, QString>();
@@ -381,20 +380,6 @@ void MainWindow::openProject(QString filename, Tab* tab, bool onNewMainWindow)
 	options->insert("ATOM_LABEL_SIZE", QString("%1").arg(Atom::SmallLabel));
 
 	resetToolBox(options);
-
-	animationSlider->blockSignals(true);
-
-	// Update toolbox widgets
-	if (parser()->numMolecules() <= 1)
-		animationWidget->setEnabled(false);
-	else
-		animationWidget->setEnabled(true);
-	animationSlider->setRange(0, tab->parser->numMolecules() - 1);
-	animationSlider->setValue(tab->parser->current());
-
-	animationSlider->blockSignals(false);
-
-	resetSignalsOnFileLoad();
 
 	reader.readNextStartElement();
 	if(reader.hasError())

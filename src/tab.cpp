@@ -6,6 +6,7 @@ Tab::Tab(FileParser* parser)
 	this->label = "";
 	this->windowLabel = "";
 	this->toolBarState = new ToolBarState();
+	this->toolBoxState = ToolBoxState::defaultToolBoxState();
 	this->undoStack = new QUndoStack();
 	this->parser = parser;
 	this->drawingInfo = new DrawingInfo();
