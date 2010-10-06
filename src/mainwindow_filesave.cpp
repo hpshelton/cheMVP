@@ -377,7 +377,7 @@ void MainWindow::openProject(QString filename, Tab* tab, bool onNewMainWindow)
 
 	// Atoms
 	options->insert("ATOM_DRAWING_STYLE", QString("%1").arg(tab->drawingInfo->getDrawingStyle()));
-	options->insert("ATOM_LABEL_SIZE", QString("%1").arg(Atom::SmallLabel));
+	options->insert("ATOM_LABEL_STYLE", QString("%1").arg(Atom::SmallLabel));
 
 	resetToolBox(options);
 

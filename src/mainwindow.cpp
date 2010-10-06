@@ -247,7 +247,8 @@ void MainWindow::setAtomLabels()
 
 void MainWindow::changeAtomSize()
 {
-	if(atomSizeSpinBox->value() == atomSizeSpinBox->minimum()) return;
+	double value = atomSizeSpinBox->value();
+	if(value == atomSizeSpinBox->minimum()) return;
 
 	if(atomSizeSpinBox->specialValueText().size()){
 		atomSizeSpinBox->setSpecialValueText(tr(""));
@@ -257,11 +258,12 @@ void MainWindow::changeAtomSize()
 		foreach(item, canvas()->selectedItems()){
 			if(item->type() == Atom::Type){
 				Atom *atom = dynamic_cast<Atom*>(item);
-				atom->setScaleFactor(atomSizeSpinBox->value());
+				atom->setScaleFactor(value);
 			}
 		}
 		canvas()->refresh();
 	}
+	currentTab()->toolBoxState->setAtomSize(QString("%1").arg(value));
 }
 
 void MainWindow::foggingToggled(int useFogging)
@@ -274,7 +276,8 @@ void MainWindow::foggingToggled(int useFogging)
 
 void MainWindow::changeBondSize()
 {
-	if(bondSizeSpinBox->value() == bondSizeSpinBox->minimum()) return;
+	double value = bondSizeSpinBox->value();
+	if(value == bondSizeSpinBox->minimum()) return;
 
 	if(bondSizeSpinBox->specialValueText().size()) {
 		bondSizeSpinBox->setSpecialValueText(tr(""));
@@ -284,11 +287,12 @@ void MainWindow::changeBondSize()
 		foreach(item, canvas()->selectedItems()) {
 			if(item->type() == Bond::Type) {
 				Bond *bond = dynamic_cast<Bond*>(item);
-				bond->setThickness(bondSizeSpinBox->value());
+				bond->setThickness(value);
 			}
 		}
 		canvas()->refresh();
 	}
+	currentTab()->toolBoxState->setBondThickness(QString("%1").arg(value));
 }
 
 void MainWindow::changeZoom(int val)
@@ -314,6 +318,42 @@ void MainWindow::setBackgroundOpacity(int i)
 {
 	canvas()->setBackgroundOpacity(i);
 	currentTab()->toolBoxState->setBackgroundOpacity(i);
+}
+
+void MainWindow::setBondLabelPrecision(int i)
+{
+	canvas()->setBondLabelPrecision(i);
+	currentTab()->toolBoxState->setBondPrecision(i);
+}
+
+void MainWindow::setAngleLabelPrecision(int i)
+{
+	canvas()->setAngleLabelPrecision(i);
+	currentTab()->toolBoxState->setAnglePrecision(i);
+}
+
+void MainWindow::setAtomDrawingStyle(int i)
+{
+	canvas()->setAtomDrawingStyle(i);
+	currentTab()->toolBoxState->setAtomStyle(i);
+}
+
+void MainWindow::atomLabelFontChanged(QFont f)
+{
+	canvas()->atomLabelFontChanged(f);
+	currentTab()->toolBoxState->setAtomLabelFont(f.family());
+}
+
+void MainWindow::atomLabelFontSizeChanged(QString s)
+{
+	canvas()->atomLabelFontSizeChanged(s);
+	currentTab()->toolBoxState->setAtomLabelSize(s);
+}
+
+void MainWindow::setAtomFontSizeStyle(int i)
+{
+	canvas()->setAtomFontSizeStyle(i);
+	currentTab()->toolBoxState->setAtomLabelStyle(i);
 }
 
 void MainWindow::resetSignalsOnFileLoad()
@@ -344,13 +384,13 @@ void MainWindow::resetSignalsOnFileLoad()
 	connect(toggleBondLabelsButton, SIGNAL(pressed()), canvas(), SLOT(toggleBondLabels()));
 
 	disconnect(bondLabelsPrecisionBox, 0, 0, 0);
-	connect(bondLabelsPrecisionBox, SIGNAL(valueChanged(int)), canvas(), SLOT(setBondLabelPrecision(int)));
+	connect(bondLabelsPrecisionBox, SIGNAL(valueChanged(int)), this, SLOT(setBondLabelPrecision(int)));
 
 	disconnect(toggleAngleLabelsButton, 0, 0, 0);
 	connect(toggleAngleLabelsButton, SIGNAL(pressed()), canvas(), SLOT(toggleAngleLabels()));
 
 	disconnect(angleLabelsPrecisionBox, 0, 0, 0);
-	connect(angleLabelsPrecisionBox, SIGNAL(valueChanged(int)), canvas(), SLOT(setAngleLabelPrecision(int)));
+	connect(angleLabelsPrecisionBox, SIGNAL(valueChanged(int)), this, SLOT(setAngleLabelPrecision(int)));
 
 	disconnect(toggleBondDashingButton, 0, 0, 0);
 	connect(toggleBondDashingButton, SIGNAL(pressed()), canvas(), SLOT(toggleBondDashing()));
@@ -359,19 +399,19 @@ void MainWindow::resetSignalsOnFileLoad()
 	connect(atomColorButton, SIGNAL(clicked()), canvas(), SLOT(setAtomColors()));
 
 	disconnect(atomDrawingStyleButtonGroup, 0, 0, 0);
-	connect(atomDrawingStyleButtonGroup, SIGNAL(buttonClicked(int)), canvas(), SLOT(setAtomDrawingStyle(int)));
+	connect(atomDrawingStyleButtonGroup, SIGNAL(buttonClicked(int)), this, SLOT(setAtomDrawingStyle(int)));
 
-	disconnect(atomDrawingStyleButtonGroup, 0, 0, 0);
+	disconnect(toggleAtomNumberSubscriptsButton, 0, 0, 0);
 	connect(toggleAtomNumberSubscriptsButton, SIGNAL(pressed()), canvas(), SLOT(toggleAtomNumberSubscripts()));
 
 	disconnect(atomLabelFontCombo, 0, 0, 0);
-	connect(atomLabelFontCombo, SIGNAL(currentFontChanged(const QFont &)), canvas(), SLOT(atomLabelFontChanged(const QFont &)));
+	connect(atomLabelFontCombo, SIGNAL(currentFontChanged(const QFont &)), this, SLOT(atomLabelFontChanged(const QFont &))); //HPS - this signal never gets fired
 
 	disconnect(atomLabelFontSizeCombo, 0, 0, 0);
-	connect(atomLabelFontSizeCombo, SIGNAL(currentIndexChanged(const QString &)), canvas(), SLOT(atomLabelFontSizeChanged(const QString &)));
+	connect(atomLabelFontSizeCombo, SIGNAL(currentIndexChanged(const QString &)), this, SLOT(atomLabelFontSizeChanged(const QString &)));
 
 	disconnect(atomFontSizeButtonGroup, 0, 0, 0);
-	connect(atomFontSizeButtonGroup, SIGNAL(buttonClicked(int)), canvas(), SLOT(setAtomFontSizeStyle(int)));
+	connect(atomFontSizeButtonGroup, SIGNAL(buttonClicked(int)), this, SLOT(setAtomFontSizeStyle(int)));
 
 	// Re-sync toolbar to (possibly) new canvas
 	mouseModeButtonGroupClicked(mouseModeButtonGroup->checkedId());

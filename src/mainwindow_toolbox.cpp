@@ -307,7 +307,7 @@ QWidget *MainWindow::createAtomsWidget(QMap<QString, QString>* options)
 	largeLabelAtomDrawingButton 	 = new QRadioButton(tr("Large Label"));
 	atomFontSizeButtonGroup->addButton(smallLabelAtomDrawingButton, int(Atom::SmallLabel));
 	atomFontSizeButtonGroup->addButton(largeLabelAtomDrawingButton, int(Atom::LargeLabel));
-	atomFontSizeButtonGroup->button(options->value("ATOM_LABEL_SIZE").toInt())->setChecked(true);
+	atomFontSizeButtonGroup->button(options->value("ATOM_LABEL_STYLE").toInt())->setChecked(true);
 	labelStyleLayout->addWidget(smallLabelAtomDrawingButton, 4, 0);
 	labelStyleLayout->addWidget(largeLabelAtomDrawingButton, 4, 1);
 
@@ -347,7 +347,7 @@ QMap<QString, QString>* MainWindow::defaultToolBoxOptions()
 
 	// Atoms
 	options->insert("ATOM_DRAWING_STYLE", QString("%1").arg(DrawingInfo::Gradient));
-	options->insert("ATOM_LABEL_SIZE", QString("%1").arg(Atom::SmallLabel));
+	options->insert("ATOM_LABEL_STYLE", QString("%1").arg(Atom::SmallLabel));
 
 	return options;
 }
@@ -383,7 +383,41 @@ void MainWindow::resetToolBox(QMap<QString, QString>* options)
 	bondLabelsPrecisionBox->setValue(options->value("BOND_LABEL_PRECISION").toInt());
 	angleLabelsPrecisionBox->setValue(options->value("ANGLE_LABEL_PRECISION").toInt());
 	atomDrawingStyleButtonGroup->button(options->value("ATOM_DRAWING_STYLE").toInt())->setChecked(true);
-	atomFontSizeButtonGroup->button(options->value("ATOM_LABEL_SIZE").toInt())->setChecked(true);
+	atomFontSizeButtonGroup->button(options->value("ATOM_LABEL_STYLE").toInt())->setChecked(true);
+
+	atomSizeSpinBox->blockSignals(true);
+	QString atomSize = options->value("ATOM_SIZE", "Select Atoms");
+	if(atomSize.compare("Select Atoms") == 0)
+	{
+		atomSizeSpinBox->setSpecialValueText(tr("Select Atoms"));
+		atomSizeSpinBox->setValue(atomSizeSpinBox->minimum());
+	}
+	else if(atomSize.compare(tr("  ")) == 0)
+	{
+		atomSizeSpinBox->setSpecialValueText(tr("  "));
+		atomSizeSpinBox->setValue(atomSizeSpinBox->minimum());
+	}
+	else
+		atomSizeSpinBox->setValue(atomSize.toDouble());
+	atomSizeSpinBox->blockSignals(false);
+
+	bondSizeSpinBox->blockSignals(true);
+	QString bondSize = options->value("BOND_THICKNESS", "Select Bonds");
+	if(bondSize.compare("Select Bonds") == 0)
+	{
+		bondSizeSpinBox->setSpecialValueText(tr("Select Bonds"));
+		bondSizeSpinBox->setValue(bondSizeSpinBox->minimum());
+	}
+	else if(bondSize.compare(tr("  ")) == 0)
+	{
+		bondSizeSpinBox->setSpecialValueText(tr("  "));
+		bondSizeSpinBox->setValue(bondSizeSpinBox->minimum());
+	}
+	else
+		bondSizeSpinBox->setValue(bondSize.toDouble());
+	bondSizeSpinBox->blockSignals(false);
+
+	atomLabelFontCombo->setEditText(options->value("ATOM_LABEL_FONT", "Select Atoms"));
 
 	if(wasNull)
 		delete options;

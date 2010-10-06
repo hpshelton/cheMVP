@@ -71,6 +71,12 @@ private slots:
 	void setUseFogging(bool b);
 	void setFoggingScale(int i);
 	void setBackgroundOpacity(int i);
+	void setBondLabelPrecision(int i);
+	void setAngleLabelPrecision(int i);
+	void setAtomDrawingStyle(int i);
+	void atomLabelFontChanged(QFont f);
+	void atomLabelFontSizeChanged(QString s);
+	void setAtomFontSizeStyle(int i);
 
 private:
 	void focusOutEvent(QFocusEvent *event);

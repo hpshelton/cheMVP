@@ -23,7 +23,7 @@ ToolBoxState* ToolBoxState::defaultToolBoxState()
 
 	// Atoms
 	options->insert("ATOM_DRAWING_STYLE", QString("%1").arg(DrawingInfo::Gradient));
-	options->insert("ATOM_LABEL_SIZE", QString("%1").arg(Atom::SmallLabel));
+	options->insert("ATOM_LABEL_STYLE", QString("%1").arg(Atom::SmallLabel));
 
 	return new ToolBoxState(options);
 }
@@ -61,4 +61,44 @@ void ToolBoxState::setZRotation(int i)
 void ToolBoxState::setZoom(int i)
 {
 	_options->insert("ZOOM", QString("%1").arg(i));
+}
+
+void ToolBoxState::setBondPrecision(int i)
+{
+	_options->insert("BOND_LABEL_PRECISION", QString("%1").arg(i));
+}
+
+void ToolBoxState::setAnglePrecision(int i)
+{
+	_options->insert("ANGLE_LABEL_PRECISION", QString("%1").arg(i));
+}
+
+void ToolBoxState::setAtomSize(QString s)
+{
+	_options->insert("ATOM_SIZE", s);
+}
+
+void ToolBoxState::setAtomStyle(int i)
+{
+	_options->insert("ATOM_DRAWING_STYLE", QString("%1").arg(i));
+}
+
+void ToolBoxState::setAtomLabelFont(QString s)
+{
+	_options->insert("ATOM_LABEL_FONT", s);
+}
+
+void ToolBoxState::setAtomLabelSize(QString s)
+{
+	_options->insert("ATOM_LABEL_SIZE", s);
+}
+
+void ToolBoxState::setAtomLabelStyle(int i)
+{
+	_options->insert("ATOM_LABEL_STYLE", QString("%1").arg(i));
+}
+
+void ToolBoxState::setBondThickness(QString s)
+{
+	_options->insert("BOND_THICKNESS", s);
 }

@@ -90,7 +90,8 @@ void MainWindow::updateMenus()
 	}
 
 	// Make the atom size menu appear correctly
-	if(atomScaleFactors.size()){
+	if(atomScaleFactors.size())
+	{
 		bool sameValues = true;
 		foreach(double i, atomScaleFactors){
 			if(fabs(i - atomScaleFactors[0])>TINY){
@@ -101,13 +102,16 @@ void MainWindow::updateMenus()
 		if(sameValues){
 			atomSizeSpinBox->setSpecialValueText(tr(""));
 			atomSizeSpinBox->setValue(atomScaleFactors[0]);
+			currentTab()->toolBoxState->setAtomSize(QString("%1").arg(atomSizeSpinBox->value()));
 		}else{
 			atomSizeSpinBox->setSpecialValueText(tr("  "));
 			atomSizeSpinBox->setValue(atomSizeSpinBox->minimum());
+			currentTab()->toolBoxState->setAtomSize(tr("  "));
 		}
 	}else{
 		atomSizeSpinBox->setSpecialValueText(tr("Select Atoms"));
 		atomSizeSpinBox->setValue(atomSizeSpinBox->minimum());
+		currentTab()->toolBoxState->setAtomSize(tr("Select Atoms"));
 	}
 
 	// Make the atom labels menu appears correctly
@@ -140,13 +144,16 @@ void MainWindow::updateMenus()
 		if(sameValues){
 			bondSizeSpinBox->setSpecialValueText(tr(""));
 			bondSizeSpinBox->setValue(bondScaleFactors[0]);
+			currentTab()->toolBoxState->setBondThickness(QString("%1").arg(bondSizeSpinBox->value()));
 		}else{
 			bondSizeSpinBox->setSpecialValueText(tr("  "));
 			bondSizeSpinBox->setValue(bondSizeSpinBox->minimum());
+			currentTab()->toolBoxState->setBondThickness(tr("  "));
 		}
 	}else{
 		bondSizeSpinBox->setSpecialValueText(tr("Select Bonds"));
 		bondSizeSpinBox->setValue(bondSizeSpinBox->minimum());
+		currentTab()->toolBoxState->setBondThickness(tr("Select Bonds"));
 	}
 
 	// Make the atom labels font menu appears correctly
@@ -159,12 +166,15 @@ void MainWindow::updateMenus()
 			}
 		}
 		if(sameValues){
-			atomLabelFontCombo->setEditText(atomLabelFonts[0]);
+			atomLabelFontCombo->setEditText(atomLabelFonts[0]); // HPS - this may be wrong
+			currentTab()->toolBoxState->setAtomLabelFont(atomLabelFonts[0]);
 		}else{
 			atomLabelFontCombo->setEditText(tr(""));
+			currentTab()->toolBoxState->setAtomLabelFont("");
 		}
 	}else{
 		atomLabelFontCombo->setEditText(tr("Select Atoms"));
+		currentTab()->toolBoxState->setAtomLabelFont("Select Atoms");
 	}
 
 	// Make the atom labels font size menu appears correctly

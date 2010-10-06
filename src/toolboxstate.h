@@ -23,6 +23,14 @@ public:
 	void setZRotation(int i);
 	void setBackgroundOpacity(int i);
 	void setZoom(int i);
+	void setBondPrecision(int i);
+	void setAnglePrecision(int i);
+	void setAtomSize(QString s);
+	void setAtomStyle(int i);
+	void setAtomLabelFont(QString s);
+	void setAtomLabelSize(QString s);
+	void setAtomLabelStyle(int i);
+	void setBondThickness(QString s);
 };
 
 #endif // TOOLBOXSTATE_H
