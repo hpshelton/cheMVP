@@ -26,7 +26,7 @@ Tab::Tab(FileParser* parser)
 	this->canvas->refresh();
 
 	QHBoxLayout* tabLayout = new QHBoxLayout;
-	tabLayout->setContentsMargins(0,0,0,0);
+	tabLayout->setContentsMargins(0, 0, 0, 0);
 	tabLayout->addWidget(this->view);
 
 	this->setLayout(tabLayout);
@@ -53,6 +53,7 @@ void Tab::update()
 	if(this->layout()->indexOf(this->view) != -1)
 		this->layout()->removeWidget(this->view);
 
+	QGraphicsView* oldview = this->view;
 	this->view = new DrawingDisplay(this->canvas, this->drawingInfo);
 	this->view->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 	this->view->setGeometry(0, 0, static_cast<int>(DEFAULT_SCENE_SIZE_X), static_cast<int>(DEFAULT_SCENE_SIZE_Y));
@@ -61,4 +62,5 @@ void Tab::update()
 	this->view->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
 
 	this->layout()->addWidget(this->view);
+	delete oldview;
 }

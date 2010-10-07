@@ -16,7 +16,7 @@ MainWindow::MainWindow(FileParser *parser_in)
 	createToolbars();
 
 	tabWidget = new QTabWidget(this);
-	tabWidget->setTabPosition(QTabWidget::North);
+	tabWidget->setTabPosition(QTabWidget::South);
 	tabWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	tabWidget->setGeometry(0, 0, static_cast<int>(DEFAULT_SCENE_SIZE_X), static_cast<int>(DEFAULT_SCENE_SIZE_Y));
 	tabWidget->setDocumentMode(true);
