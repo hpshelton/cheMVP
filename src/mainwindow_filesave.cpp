@@ -282,7 +282,6 @@ void MainWindow::loadFile(FileParser* p, Tab* tab)
 		tabWidget->addTab(tab, tab->label);
 		tabWidget->setCurrentIndex(tabWidget->count()-1);
 		tabWidget->setTabText(tabWidget->currentIndex(), tab->label);
-		//tabSelected();
 		previousTab = tabWidget->currentIndex();
 
 		resetToolBox(NULL);
@@ -343,9 +342,9 @@ void MainWindow::openProject(QString filename, Tab* tab, bool onNewMainWindow)
 
 	QXmlStreamReader reader(&file);
 	reader.readNextStartElement();
-	if(reader.attributes().value("version").toString() != CHEMVP_VERSION)
+	if(reader.attributes().value("version").toString() > CHEMVP_VERSION)
 	{
-		error("Invalid Version Number!");
+		error("This file was created in a newer version of CheMVP!");
 		return;
 	}
 
@@ -357,7 +356,6 @@ void MainWindow::openProject(QString filename, Tab* tab, bool onNewMainWindow)
 	tabWidget->addTab(tab, tab->label);
 	tabWidget->setCurrentIndex(tabWidget->count()-1);
 	tabWidget->setTabText(tabWidget->currentIndex(), tab->label);
-//	tabSelected();
 	previousTab = tabWidget->currentIndex();
 
 	QMap<QString, QString>* options = new QMap<QString, QString>();

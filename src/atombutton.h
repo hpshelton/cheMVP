@@ -7,23 +7,23 @@
 #include <QColor>
 
 #include "atom.h"
-#include "drawingcanvas.h"
+#include "tab.h"
 #include "preferences.h"
 
 class AtomButton : public QToolButton
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
-    AtomButton(DrawingCanvas* d, const char* label);
-    void refreshColor();
-    
+	AtomButton(Tab* t, const char* label);
+	void refreshColor();
+
 public slots:
-    void setAtomColor();
+	void setAtomColor();
 
 protected:
-    DrawingCanvas* _canvas;
-    QString _label;
+	Tab* _currentTab;
+	QString _label;
 };
 
 #endif /* ATOMBUTTON_H */

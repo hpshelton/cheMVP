@@ -125,11 +125,14 @@ void MainWindow::updateMenus()
 		}
 		if(sameValues){
 			atomLabelInput->setText(atomLabels[0]);
+			currentTab()->toolBoxState->setAtomLabelText(atomLabels[0]);
 		}else{
 			atomLabelInput->setText("");
+			currentTab()->toolBoxState->setAtomLabelText("");
 		}
 	}else{
 		atomLabelInput->setText(tr("Select Atoms"));
+		currentTab()->toolBoxState->setAtomLabelText("Select Atoms");
 	}
 
 	// Make the bond thickness menu appears correctly
@@ -166,8 +169,10 @@ void MainWindow::updateMenus()
 			}
 		}
 		if(sameValues){
-			atomLabelFontCombo->setEditText(atomLabelFonts[0]); // HPS - this may be wrong
-			currentTab()->toolBoxState->setAtomLabelFont(atomLabelFonts[0]);
+			QString font = atomLabelFonts[0];
+			atomLabelFontCombo->setCurrentFont(QFont(font));
+			atomLabelFontCombo->setEditText(font);
+			currentTab()->toolBoxState->setAtomLabelFont(font);
 		}else{
 			atomLabelFontCombo->setEditText(tr(""));
 			currentTab()->toolBoxState->setAtomLabelFont("");
@@ -187,11 +192,17 @@ void MainWindow::updateMenus()
 			}
 		}
 		if(sameValues){
-			atomLabelFontSizeCombo->setEditText(QString().setNum(atomLabelFontSizes[0]));
+			QString v = QString().setNum(atomLabelFontSizes[0]);
+			atomLabelFontSizeCombo->setCurrentIndex(atomLabelFontSizeCombo->findText(v));
+			currentTab()->toolBoxState->setAtomLabelSize(v);
 		}else{
-			atomLabelFontSizeCombo->setEditText(tr(""));
+			atomLabelFontSizeCombo->blockSignals(true);
+			atomLabelFontSizeCombo->setCurrentIndex(-1);
+			currentTab()->toolBoxState->setAtomLabelSize(tr(""));
+			atomLabelFontSizeCombo->blockSignals(false);
 		}
 	}else{
 		atomLabelFontSizeCombo->setEditText(tr("Select Atoms"));
+		currentTab()->toolBoxState->setAtomLabelSize("Select Atoms");
 	}
 }

@@ -252,6 +252,7 @@ void MainWindow::setAddArrowMode()
 void MainWindow::setAtomLabels()
 {
 	canvas()->setAtomLabels(atomLabelInput->text());
+	currentTab()->toolBoxState->setAtomLabelText(atomLabelInput->text());
 }
 
 void MainWindow::changeAtomSize()
@@ -413,8 +414,8 @@ void MainWindow::resetSignalsOnFileLoad()
 	disconnect(toggleAtomNumberSubscriptsButton, 0, 0, 0);
 	connect(toggleAtomNumberSubscriptsButton, SIGNAL(pressed()), canvas(), SLOT(toggleAtomNumberSubscripts()));
 
-	disconnect(atomLabelFontCombo, 0, 0, 0);
-	connect(atomLabelFontCombo, SIGNAL(currentFontChanged(const QFont &)), this, SLOT(atomLabelFontChanged(const QFont &))); //HPS - this signal never gets fired
+	// Disconnecting this combo breaks the update signal?
+	connect(atomLabelFontCombo, SIGNAL(currentFontChanged(const QFont &)), this, SLOT(atomLabelFontChanged(const QFont &)));
 
 	disconnect(atomLabelFontSizeCombo, 0, 0, 0);
 	connect(atomLabelFontSizeCombo, SIGNAL(currentIndexChanged(const QString &)), this, SLOT(atomLabelFontSizeChanged(const QString &)));

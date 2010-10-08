@@ -120,9 +120,18 @@ void MainWindow::aboutCheMVP()
 
 void MainWindow::showPreferences()
 {
-	// Preferences broken by tabs
-	//Preferences* prefs = new Preferences(canvas(), drawingInfo()->getDrawingStyle());
-	//prefs->exec();
+	Preferences* prefs = new Preferences(static_cast<Tab*>(this->tabWidget->currentWidget()));
+	prefs->exec();
+
+	for(int i = 0; i < tabWidget->count(); i++)
+	{
+		QWidget* w = tabWidget->widget(i);
+		if(w != tabWidget->currentWidget())
+		{
+			Tab* t = static_cast<Tab*>(w);
+			t->canvas->updateAtomColors(Preferences::_colorChanges);
+		}
+	}
 }
 
 void MainWindow::closeCurrentTab()

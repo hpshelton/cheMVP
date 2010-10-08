@@ -417,7 +417,28 @@ void MainWindow::resetToolBox(QMap<QString, QString>* options)
 		bondSizeSpinBox->setValue(bondSize.toDouble());
 	bondSizeSpinBox->blockSignals(false);
 
-	atomLabelFontCombo->setEditText(options->value("ATOM_LABEL_FONT", "Select Atoms"));
+	atomLabelInput->setText(options->value("ATOM_LABEL_TEXT", "Select Atoms"));
+
+	QString font = options->value("ATOM_LABEL_FONT", "Select Atoms");
+	if(font.compare("Select Atoms") == 0)
+		atomLabelFontCombo->setEditText("Select Atoms");
+	else
+	{
+		atomLabelFontCombo->blockSignals(true);
+		atomLabelFontCombo->setCurrentFont(QFont(font));
+		atomLabelFontCombo->setEditText(font);
+		atomLabelFontCombo->blockSignals(false);
+	}
+
+	QString size = options->value("ATOM_LABEL_SIZE", "Select Atoms");
+	if(size.compare("Select Atoms") == 0)
+		atomLabelFontSizeCombo->setEditText("Select Atoms");
+	else
+	{
+		atomLabelFontSizeCombo->blockSignals(true);
+		atomLabelFontSizeCombo->setCurrentIndex(atomLabelFontSizeCombo->findText(size));
+		atomLabelFontSizeCombo->blockSignals(false);
+	}
 
 	if(wasNull)
 		delete options;

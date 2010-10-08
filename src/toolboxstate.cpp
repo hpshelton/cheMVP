@@ -83,6 +83,11 @@ void ToolBoxState::setAtomStyle(int i)
 	_options->insert("ATOM_DRAWING_STYLE", QString("%1").arg(i));
 }
 
+void ToolBoxState::setAtomLabelText(QString s)
+{
+	_options->insert("ATOM_LABEL_TEXT", s);
+}
+
 void ToolBoxState::setAtomLabelFont(QString s)
 {
 	_options->insert("ATOM_LABEL_FONT", s);

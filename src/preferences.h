@@ -12,40 +12,38 @@
 #include <QDialog>
 #include <QList>
 
-#include "drawinginfo.h"
-#include "drawingcanvas.h"
+#include "tab.h"
 #include "defines.h"
 #include "atombutton.h"
 
 class Preferences : public QDialog
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
-    Preferences(DrawingCanvas* d, int s);
+	Preferences(Tab* t);
 
-    static QMap<QString, QVariant> _colorChanges;
+	static QMap<QString, QVariant> _colorChanges;
 
 public slots:
-    void savePreferences();
-    void restoreDefaults();
-    void revert();
+	void savePreferences();
+	void restoreDefaults();
+	void revert();
 
 protected:
-    int _drawingStyle;
-    DrawingCanvas* _canvas;
+	Tab* _currentTab;
 
-    QWidget* _periodicTable;
-    QList<QToolButton*> _atomButtons;
+	QWidget* _periodicTable;
+	QList<QToolButton*> _atomButtons;
 
-    QListWidget* _listWidget;
-    QStackedWidget* _stackedWidget;
-    QPushButton* _applyButton;
-    QPushButton* _closeButton;
-    QPushButton* _revertButton;
+	QListWidget* _listWidget;
+	QStackedWidget* _stackedWidget;
+	QPushButton* _applyButton;
+	QPushButton* _closeButton;
+	QPushButton* _revertButton;
 
-    QWidget* createPeriodicTable();
-    QToolButton* makeAtomButton(const char* label);
+	QWidget* createPeriodicTable();
+	QToolButton* makeAtomButton(const char* label);
 };
 
 #endif /* PREFERENCES_H */

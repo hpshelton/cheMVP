@@ -27,6 +27,7 @@ public:
 	void setAnglePrecision(int i);
 	void setAtomSize(QString s);
 	void setAtomStyle(int i);
+	void setAtomLabelText(QString s);
 	void setAtomLabelFont(QString s);
 	void setAtomLabelSize(QString s);
 	void setAtomLabelStyle(int i);
