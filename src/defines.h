@@ -4,7 +4,7 @@
 #define COMPANY_NAME "CCQC"
 #define COMPANY_DOMAIN "ccqc.uga.edu"
 #define PROGRAM_NAME "cheMVP"
-#define CHEMVP_VERSION "0.2"
+#define CHEMVP_VERSION "0.3"
 
 //These are the types used in the enums to distinguish drawing types
 #define ATOMTYPE  1
