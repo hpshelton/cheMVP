@@ -30,6 +30,9 @@ Tab::Tab(FileParser* parser)
 	tabLayout->addWidget(this->view);
 
 	this->setLayout(tabLayout);
+
+	// HPS - Hack to override gray container color on tooltips
+	this->setStyleSheet("QToolTip { background: #FFFFCA; };");
 }
 
 void Tab::update()

@@ -15,8 +15,9 @@ MainWindow::MainWindow(FileParser *parser_in)
 	createMenus();
 	createToolbars();
 
-	tabWidget = new QTabWidget(this);
-	tabWidget->setTabPosition(QTabWidget::South);
+	QWidget* container = new QWidget(this);
+	tabWidget = new QTabWidget(container);
+	tabWidget->setTabPosition(QTabWidget::North);
 	tabWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	tabWidget->setGeometry(0, 0, static_cast<int>(DEFAULT_SCENE_SIZE_X), static_cast<int>(DEFAULT_SCENE_SIZE_Y));
 	tabWidget->setDocumentMode(true);
@@ -42,7 +43,15 @@ MainWindow::MainWindow(FileParser *parser_in)
 
 	layout = new QHBoxLayout;
 	splitter = new QSplitter(Qt::Horizontal);
-	splitter->addWidget(tabWidget);
+
+	QVBoxLayout* containerLayout = new QVBoxLayout(container);
+	containerLayout->addWidget(tabWidget);
+	container->setLayout(containerLayout);
+	container->setContentsMargins(-12, -4, -12, -12);
+	container->setStyleSheet("background-color: #979797;");
+	container->setGeometry(0, 0, static_cast<int>(DEFAULT_SCENE_SIZE_X), static_cast<int>(DEFAULT_SCENE_SIZE_Y));
+
+	splitter->addWidget(container);
 	splitter->addWidget(toolBox);
 	layout->addWidget(splitter);
 

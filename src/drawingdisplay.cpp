@@ -6,7 +6,7 @@ DrawingDisplay::DrawingDisplay(DrawingCanvas *scene, DrawingInfo *info):
 		canvas(scene)
 {
 	QGraphicsView::setBackgroundBrush(QBrush(QColor(255,255,255))); // HPS - removes crazy black line for some reason
-	QGraphicsView::setStyleSheet("QGraphicsView {border: 2px solid #A0A0A0}");
+	QGraphicsView::setStyleSheet("QGraphicsView {border: 1px solid #404040; border-top: 0px;};");
 }
 
 void DrawingDisplay::resizeEvent(QResizeEvent *event)
